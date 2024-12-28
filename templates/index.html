@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitter Trends Scraper</title>
+</head>
+<body>
+    <h1>Twitter Trends Scraper</h1>
+    <button id="scrapeButton">Click here to run the script</button>
+
+    <div id="results" style="display:none;">
+        <h3>These are the most happening topics as of: <span id="dateTime"></span></h3>
+        <ul id="trendingList"></ul>
+        <p>The IP address used for this query was: <span id="ipAddress"></span></p>
+        <h3>JSON Extract from MongoDB:</h3>
+        <pre id="jsonExtract"></pre>
+    </div>
+
+    <script>
+        document.getElementById("scrapeButton").addEventListener("click", async () => {
+            const response = await fetch("/run-scraper");
+            const data = await response.json();
+
+            const resultsDiv = document.getElementById("results");
+            resultsDiv.style.display = 'block'; // Show the results div
+
+            // Fill in the data dynamically
+            document.getElementById('dateTime').innerText = data.datetime;
+            document.getElementById('ipAddress').innerText = data.ip_address;
+
+            const trendingList = document.getElementById('trendingList');
+            trendingList.innerHTML = '';  // Clear any previous results
+            // Display the top 5 trends dynamically
+            data.trendingTopics.forEach(topic => {
+                const li = document.createElement('li');
+                li.innerText = topic;
+                trendingList.appendChild(li);
+            });
+
+            // Display the JSON extract from MongoDB
+            document.getElementById('jsonExtract').innerText = JSON.stringify(data, null, 2);
+        });
+    </script>
+</body>
+</html>
